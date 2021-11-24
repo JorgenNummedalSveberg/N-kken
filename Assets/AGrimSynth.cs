@@ -209,6 +209,7 @@ public class AGrimSynth : MonoBehaviour
     [Range(0, 2)] public float startAmplitude;
     public bool repeating;
     [Range(0, 2)] public float length;
+    private Random _rand = new Random();
 
     private void Start()
     {
@@ -277,13 +278,13 @@ public class AGrimSynth : MonoBehaviour
                 }
 
                 frequency = _waves[0].Frequency();
-                amp = ((float) _envelope.GetAmplitude(TimeInMilliseconds())) * 0.2f * volume * Oscillate(_waves);
+                amp = ((float) _envelope.GetAmplitude(TimeInMilliseconds())) * 0.2f * volume * Oscillate(_waves, _rand);
                 data[i + j] = amp;
             }
             graphData[i] = (int)Math.Round(amp*1000);
         }
     }
-    public static float Oscillate( Wave[] waves)
+    public static float Oscillate(Wave[] waves, Random random)
     {
         float value = Mathf.Sin(waves[0].TimeStep);
         for (var i = 0; i < waves.Length; i++)
@@ -305,7 +306,7 @@ public class AGrimSynth : MonoBehaviour
                     waveValue = wave.Amplitude * Sawtooth(wave.TimeStep, wave.Frequency());
                     break;
                 case WaveType.Noise:
-                    waveValue = wave.Amplitude * Noise(wave.TimeStep);
+                    waveValue = wave.Amplitude * Noise(wave.TimeStep, random);
                     break;
             }
 
@@ -341,10 +342,9 @@ public class AGrimSynth : MonoBehaviour
         float positionInCurve = Mod(dTime, frequency);
         return 0.3f * positionInCurve;
     }
-    public static float Noise(float dTime)
+    public static float Noise(float dTime, Random random)
     {
-         Random rand = new Random();
-         float value = (float) rand.NextDouble() * 2 - 1;
+         float value = (float) random.NextDouble() * 2 - 1;
         return value;
     }
 }
