@@ -144,7 +144,7 @@ public struct Envelope
         }
         else
         {
-            if (lastAmplitude < 0)
+            if (lastAmplitude > 0)
             {
                 // Note has been released, so in release phase
                 double releaseTimeElapsed = dTime - dTriggerOffTime;
@@ -192,7 +192,8 @@ public class AGrimSynth : MonoBehaviour
     private Wave[] _waves;
     public WaveType waveType;
     private Envelope _envelope;
-    
+    public Graph graph;
+    public int[] graphData;
     [Header("Stats")]
     public float time;
     public float timeStep;
@@ -220,6 +221,7 @@ public class AGrimSynth : MonoBehaviour
 
     private void Update()
     {
+        graph.SetPoints(graphData);
         _envelope.dAttackTime = attackTime * 1000;
         _envelope.dDecayTime = decayTime * 1000;
         _envelope.dReleaseTime = releaseTime * 1000;
@@ -259,8 +261,10 @@ public class AGrimSynth : MonoBehaviour
 
     private void OnAudioFilterRead(float[] data, int channels)
     {
+        graphData = new int[data.Length];
         for (int i = 0; i < data.Length; i += channels)
         {
+            float amp = 0;
             for (int j = 0; j < channels; j++)
             {
 //                foreach (Wave wave in _waves)
@@ -273,9 +277,10 @@ public class AGrimSynth : MonoBehaviour
                 }
 
                 frequency = _waves[0].Frequency();
-
-                data[i + j] = ((float) _envelope.GetAmplitude(TimeInMilliseconds())) * 0.2f * volume * Oscillate(_waves);
+                amp = ((float) _envelope.GetAmplitude(TimeInMilliseconds())) * 0.2f * volume * Oscillate(_waves);
+                data[i + j] = amp;
             }
+            graphData[i] = (int)Math.Round(amp*1000);
         }
     }
     public static float Oscillate( Wave[] waves)
