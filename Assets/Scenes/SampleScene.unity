@@ -336,7 +336,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: -4918011459890274189, guid: f3e220d01d1a4fd4299fdd96d9653af1, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f3e220d01d1a4fd4299fdd96d9653af1, type: 3}
 --- !u!1 &720915508
 GameObject:
@@ -82561,24 +82562,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 539402681, guid: f3e220d01d1a4fd4299fdd96d9653af1, type: 3}
   m_PrefabInstance: {fileID: 622587819}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1609982924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1609982923}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04a9a4d0ea49ab44487f314649666ac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  numVoices: 8
-  baseFrequency: 31250
-  tickFrequency: 90
-  mixingBufferLength: 200
-  masterVolume: 1
-  PresetTone: {fileID: 0}
 --- !u!1 &1670603080
 GameObject:
   m_ObjectHideFlags: 0
@@ -149213,7 +149196,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1756814205, guid: 4b263bcbf6acc9849b76ba55a3af3506, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1756814205, guid: 4b263bcbf6acc9849b76ba55a3af3506, type: 3}
       propertyPath: soundFontFile
@@ -149371,6 +149354,31 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 473956d3011f1904c948dfa59c100736, type: 3}
   - {fileID: 8300000, guid: 774ab8c80bd3ffc4bad688d8c9cb056c, type: 3}
   scaryThreshold: 2
+--- !u!114 &2967033056533549994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2967033056533549992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46eb836351b62404b824558a8d4b10e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sampleRate: 96000
+  volume: 0.5
+  note: 69
+  waveType: 0
+  time: 0
+  timeStep: 0
+  increment: 0
+  frequency: 0
+  attackTime: 0.1
+  decayTime: 0.01
+  releaseTime: 0.1
+  sustainAmplitude: 0.7
+  startAmplitude: 1
 --- !u!82 &2967033056533549995 stripped
 AudioSource:
   m_CorrespondingSourceObject: {fileID: 1756814206, guid: 4b263bcbf6acc9849b76ba55a3af3506, type: 3}
