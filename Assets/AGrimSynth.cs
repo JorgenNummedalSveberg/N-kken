@@ -67,8 +67,10 @@ public struct Envelope
     public double dTriggerOnTime;
     public bool bNoteOn;
     private double lastAmplitude;
+    public double Length;
+    public bool Repeat;
     
-    public Envelope(double attackTime, double decayTime, double releaseTime, double sustainAmplitude, double startAmplitude)
+    public Envelope(double attackTime, double decayTime, double releaseTime, double sustainAmplitude, double startAmplitude, double length, bool repeat)
     {
         dAttackTime = attackTime * 1000;
         dDecayTime = decayTime * 1000;
@@ -79,6 +81,8 @@ public struct Envelope
         dTriggerOffTime = 0;
         dTriggerOnTime = 0;
         lastAmplitude = 0;
+        Length = length * 1000;
+        Repeat = repeat;
     }
     
     // Call when key is pressed
@@ -115,19 +119,42 @@ public struct Envelope
                 double relativeDecayTimeElapsed = decayTimeElapsed / dDecayTime;
                 double totalAmplitudeChange = dSustainAmplitude - dStartAmplitude;
                 dAmplitude = dStartAmplitude + totalAmplitudeChange * relativeDecayTimeElapsed;
-            } else
+            } else if (Length.Equals(0))
             {
                 // In sustain phase - dont change until note released
                 dAmplitude = dSustainAmplitude;
+            }
+            else
+            {
+                double finalDecayTimeElapsed = dLifeTime - dAttackTime-dDecayTime;
+                double relativeDecayTimeElapsed = finalDecayTimeElapsed / Length;
+                double totalAmplitudeChange = 0 - dSustainAmplitude;
+                dAmplitude = dStartAmplitude + totalAmplitudeChange * relativeDecayTimeElapsed;
+            }
+
+            if (Repeat)
+            {
+                double sustainTimeElapsed = dLifeTime - dDecayTime - dAttackTime;
+                if (sustainTimeElapsed > Length)
+                {
+                    dTriggerOnTime = dTime - dAttackTime * (dSustainAmplitude / dStartAmplitude);
+                }
             }
             lastAmplitude = dAmplitude;
         }
         else
         {
-            // Note has been released, so in release phase
-            double releaseTimeElapsed = dTime - dTriggerOffTime;
-            double relativereleaseTimeElapsed = releaseTimeElapsed / dReleaseTime;
-            dAmplitude = lastAmplitude - lastAmplitude * relativereleaseTimeElapsed;
+            if (lastAmplitude < 0)
+            {
+                // Note has been released, so in release phase
+                double releaseTimeElapsed = dTime - dTriggerOffTime;
+                double relativereleaseTimeElapsed = releaseTimeElapsed / dReleaseTime;
+                dAmplitude = lastAmplitude - lastAmplitude * relativereleaseTimeElapsed;
+            }
+            else
+            {
+                dAmplitude = 0;
+            }
         }
 
         // Amplitude should not be negative
@@ -138,9 +165,26 @@ public struct Envelope
     }
 }
 
+public enum Keys
+{
+    Z = KeyCode.Z,
+    S = KeyCode.S,
+    X = KeyCode.X,
+    D = KeyCode.D,
+    C = KeyCode.C,
+    V = KeyCode.V,
+    G = KeyCode.G,
+    B = KeyCode.B,
+    H = KeyCode.H,
+    N = KeyCode.N,
+    J = KeyCode.J,
+    M = KeyCode.M
+}
+
 public class AGrimSynth : MonoBehaviour
 {
 
+    public Keys button;
     public int _sampleRate = 96000;
     [Range(0, 1)] public float volume;
     [Range(36, 95)] public int note;
@@ -148,22 +192,27 @@ public class AGrimSynth : MonoBehaviour
     private Wave[] _waves;
     public WaveType waveType;
     private Envelope _envelope;
+    
+    [Header("Stats")]
     public float time;
     public float timeStep;
     public float increment;
     public float frequency;
     private DateTime startTime;
-
+    
+    [Header("Oscillator")]
     [Range(0, 2)] public float attackTime;
     [Range(0, 2)] public float decayTime;
     [Range(0, 2)] public float releaseTime;
     [Range(0, 2)] public float sustainAmplitude;
     [Range(0, 2)] public float startAmplitude;
+    public bool repeating;
+    [Range(0, 2)] public float length;
 
     private void Start()
     {
         Debug.Log("Starto!");
-        _envelope = new Envelope(attackTime, decayTime, releaseTime, sustainAmplitude, startAmplitude);
+        _envelope = new Envelope(attackTime, decayTime, releaseTime, sustainAmplitude, startAmplitude, length, repeating);
         _wave = new Wave(WaveType.Sine, 1, note, _sampleRate, _envelope);
         _waves = new[] {_wave};
         startTime = DateTime.Now;
@@ -176,21 +225,24 @@ public class AGrimSynth : MonoBehaviour
         _envelope.dReleaseTime = releaseTime * 1000;
         _envelope.dSustainAmplitude = sustainAmplitude;
         _envelope.dStartAmplitude = startAmplitude;
+        _envelope.Length = length * 1000;
+        _envelope.Repeat = repeating;
         for (var i = 0; i < _waves.Length; i++)
         {
             _waves[i].Note = note;
             _waves[i].Type = waveType;
             _waves[i].SampleRate = _sampleRate;
         }
+        
 
-        if (Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKeyDown((KeyCode) button))
         {
             _envelope.NoteOn(TimeInMilliseconds());
             Debug.Log("On time: " + _envelope.dTriggerOnTime);
             Debug.Log("Off time: " + _envelope.dTriggerOffTime);
             Debug.Log("Button on: " + _envelope.bNoteOn);
         }
-        if (Input.GetKeyUp(KeyCode.B))
+        if (Input.GetKeyUp((KeyCode) button))
         {
             _envelope.NoteOff(TimeInMilliseconds());
             Debug.Log("On time: " + _envelope.dTriggerOnTime);
