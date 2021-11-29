@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using MySpace;
-using MySpace.Synthesizer;
 using UnityEngine;
 using UnityEngine.Audio;
 using Object = UnityEngine.Object;
@@ -13,8 +11,6 @@ public class FeleSynth : MonoBehaviour
     [Range(0, 127)] public byte note;
     [Range(0.1f, 5f)] public float interval;
     public GameObject synthesizerObject;
-    private MySyntheStation _synthStation;
-    private MySynthesizer _synthesizer;
     private float _timer;
     private AudioSource _source;
 
@@ -26,9 +22,6 @@ public class FeleSynth : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        _synthStation = synthesizerObject.GetComponent<MySyntheStation>();
-        _synthesizer = _synthStation.Synthesizers[0];
-        _synthesizer.Channel[0].BendRange(127);
     }
 
 //    private void OnAudioFilterRead(float[] data, int channels)
@@ -69,10 +62,6 @@ public class FeleSynth : MonoBehaviour
 //        Debug.Log(val2);
 //        Debug.Log(val3);
 //        Debug.Log(val4);
-        _synthesizer.Channel[0].Modulation(val1);
-        _synthesizer.Channel[0].PitchBend(val2);
-        _synthesizer.Channel[0].Portament(val3);
-        _synthesizer.Channel[0].Damper(val4);
 //        _synthesizer.Channel[0].Modulation(val1);
 //        _synthesizer.Channel[0].Modulation(val1);
     }
@@ -86,7 +75,6 @@ public class FeleSynth : MonoBehaviour
         if (_timer >= interval)
         {
             _timer = 0;
-            _synthesizer.NoteOn(0, note, 10);
         }
     }
 }
